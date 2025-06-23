@@ -1,0 +1,209 @@
+{
+  "title": "WordPress on ECS Dashboard",
+  "description": "Monitoring dashboard for serverless WordPress on AWS ECS",
+  "widgets": [
+    {
+      "id": 0,
+      "definition": {
+        "title": "WordPress Service Health",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "id": 1,
+            "definition": {
+              "title": "ECS Service Status",
+              "type": "query_value",
+              "requests": [
+                {
+                  "q": "avg:aws.ecs.service.running{service:wordpress}",
+                  "aggregator": "avg"
+                }
+              ],
+              "autoscale": true
+            }
+          },
+          {
+            "id": 2,
+            "definition": {
+              "title": "WordPress Response Time",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "avg:trace.http.request{service:wordpress} by {http.url_details.path}",
+                  "display_type": "line"
+                }
+              ],
+              "yaxis": {
+                "label": "Response Time (ms)",
+                "scale": "linear",
+                "min": "auto",
+                "max": "auto",
+                "include_zero": true
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "definition": {
+        "title": "Infrastructure Metrics",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "id": 4,
+            "definition": {
+              "title": "CPU Usage",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "avg:ecs.fargate.cpu.percent{service:wordpress}",
+                  "display_type": "line"
+                }
+              ],
+              "yaxis": {
+                "label": "CPU %",
+                "scale": "linear",
+                "min": 0,
+                "max": 100,
+                "include_zero": true
+              }
+            }
+          },
+          {
+            "id": 5,
+            "definition": {
+              "title": "Memory Usage",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "avg:ecs.fargate.mem.rss{service:wordpress}",
+                  "display_type": "line"
+                }
+              ],
+              "yaxis": {
+                "label": "Memory (bytes)",
+                "scale": "linear",
+                "min": "auto",
+                "max": "auto",
+                "include_zero": true
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "definition": {
+        "title": "Database Metrics",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "id": 7,
+            "definition": {
+              "title": "MySQL Queries",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "avg:mysql.performance.questions{service:wordpress}",
+                  "display_type": "line"
+                }
+              ],
+              "yaxis": {
+                "label": "Queries/sec",
+                "scale": "linear",
+                "min": "auto",
+                "max": "auto",
+                "include_zero": true
+              }
+            }
+          },
+          {
+            "id": 8,
+            "definition": {
+              "title": "MySQL Connections",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "avg:mysql.net.connections{service:wordpress}",
+                  "display_type": "line"
+                }
+              ],
+              "yaxis": {
+                "label": "Connections",
+                "scale": "linear",
+                "min": "auto",
+                "max": "auto",
+                "include_zero": true
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "definition": {
+        "title": "Logs and Errors",
+        "type": "group",
+        "layout_type": "ordered",
+        "widgets": [
+          {
+            "id": 10,
+            "definition": {
+              "title": "Error Logs",
+              "type": "log_stream",
+              "indexes": ["main"],
+              "query": "service:wordpress status:error",
+              "sort": {
+                "column": "time",
+                "order": "desc"
+              },
+              "columns": ["host", "service"]
+            }
+          },
+          {
+            "id": 11,
+            "definition": {
+              "title": "Error Rate",
+              "type": "timeseries",
+              "requests": [
+                {
+                  "q": "sum:trace.http.request.errors{service:wordpress}.as_count()",
+                  "display_type": "bars"
+                }
+              ],
+              "yaxis": {
+                "label": "Errors",
+                "scale": "linear",
+                "min": "auto",
+                "max": "auto",
+                "include_zero": true
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "template_variables": [
+    {
+      "name": "env",
+      "default": "production",
+      "prefix": "env"
+    },
+    {
+      "name": "service",
+      "default": "wordpress",
+      "prefix": "service"
+    }
+  ],
+  "layout_type": "ordered",
+  "is_read_only": false,
+  "notify_list": []
+}

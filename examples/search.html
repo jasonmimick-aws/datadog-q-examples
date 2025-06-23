@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datadog Q Examples - Search</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #0052CC;
+        }
+        .filters {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        .filter-group h3 {
+            margin-bottom: 10px;
+        }
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .filter-option {
+            background-color: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .filter-option.selected {
+            background-color: #0052CC;
+            color: white;
+        }
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .example-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            transition: transform 0.2s;
+        }
+        .example-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .example-title {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .example-description {
+            margin-bottom: 15px;
+        }
+        .example-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .example-tag {
+            background-color: #e0e0e0;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .example-difficulty {
+            font-weight: bold;
+        }
+        .example-difficulty.beginner {
+            color: #36B37E;
+        }
+        .example-difficulty.intermediate {
+            color: #FF8B00;
+        }
+        .example-difficulty.advanced {
+            color: #FF5630;
+        }
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Datadog Q Examples Library - Search</h1>
+    
+    <input type="text" class="search-box" placeholder="Search examples by title, description, or tags...">
+    
+    <div class="filters">
+        <h2>Filters</h2>
+        
+        <div class="filter-group">
+            <h3>Categories</h3>
+            <div class="filter-options" id="category-filters"></div>
+        </div>
+        
+        <div class="filter-group">
+            <h3>Environments</h3>
+            <div class="filter-options" id="environment-filters"></div>
+        </div>
+        
+        <div class="filter-group">
+            <h3>Difficulty</h3>
+            <div class="filter-options" id="difficulty-filters"></div>
+        </div>
+        
+        <div class="filter-group">
+            <h3>Tools</h3>
+            <div class="filter-options" id="tool-filters"></div>
+        </div>
+    </div>
+    
+    <div class="examples" id="examples-container">
+        <div class="loading">Loading examples...</div>
+    </div>
+    
+    <script>
+        // State
+        let examplesData = null;
+        let filteredExamples = [];
+        const activeFilters = {
+            categories: new Set(),
+            environments: new Set(),
+            difficulties: new Set(),
+            tools: new Set(),
+            searchTerm: ''
+        };
+        
+        // Load examples data
+        async function loadExamplesData() {
+            try {
+                const response = await fetch('./examples.json');
+                if (!response.ok) {
+                    throw new Error('Failed to load examples data');
+                }
+                examplesData = await response.json();
+                
+                // Initialize filters
+                initializeFilters();
+                
+                // Initial render
+                filterExamples();
+                renderExamples();
+            } catch (error) {
+                console.error('Error loading examples:', error);
+                document.getElementById('examples-container').innerHTML = `
+                    <div class="no-results">
+                        <h3>Error Loading Examples</h3>
+                        <p>${error.message}</p>
+                        <p>Please make sure you've run the index generation script: <code>node scripts/generate_index.js</code></p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize filter options
+        function initializeFilters() {
+            if (!examplesData || !examplesData.filters) return;
+            
+            const filters = examplesData.filters;
+            
+            // Categories
+            renderFilterOptions('category-filters', filters.categories, 'categories');
+            
+            // Environments
+            renderFilterOptions('environment-filters', filters.environments, 'environments');
+            
+            // Difficulties
+            renderFilterOptions('difficulty-filters', filters.difficulties, 'difficulties');
+            
+            // Tools
+            renderFilterOptions('tool-filters', filters.tools, 'tools');
+            
+            // Set up search box
+            const searchBox = document.querySelector('.search-box');
+            searchBox.addEventListener('input', (e) => {
+                activeFilters.searchTerm = e.target.value.toLowerCase();
+                filterExamples();
+                renderExamples();
+            });
+        }
+        
+        // Render filter options
+        function renderFilterOptions(containerId, options, filterType) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            options.forEach(option => {
+                const element = document.createElement('div');
+                element.className = 'filter-option';
+                element.textContent = option;
+                element.addEventListener('click', () => {
+                    toggleFilter(filterType, option, element);
+                });
+                container.appendChild(element);
+            });
+        }
+        
+        // Toggle a filter
+        function toggleFilter(filterType, value, element) {
+            if (activeFilters[filterType].has(value)) {
+                activeFilters[filterType].delete(value);
+                element.classList.remove('selected');
+            } else {
+                activeFilters[filterType].add(value);
+                element.classList.add('selected');
+            }
+            
+            filterExamples();
+            renderExamples();
+        }
+        
+        // Filter examples based on active filters
+        function filterExamples() {
+            if (!examplesData || !examplesData.examples) return;
+            
+            filteredExamples = examplesData.examples.filter(example => {
+                // Filter by search term
+                if (activeFilters.searchTerm) {
+                    const searchTerm = activeFilters.searchTerm.toLowerCase();
+                    const title = (example.title || '').toLowerCase();
+                    const description = (example.description || '').toLowerCase();
+                    const categories = (example.categories || []).join(' ').toLowerCase();
+                    
+                    if (!title.includes(searchTerm) && 
+                        !description.includes(searchTerm) && 
+                        !categories.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+                
+                // Filter by categories
+                if (activeFilters.categories.size > 0) {
+                    const exampleCategories = example.categories || [];
+                    if (!Array.from(activeFilters.categories).some(category => 
+                        exampleCategories.includes(category))) {
+                        return false;
+                    }
+                }
+                
+                // Filter by environments
+                if (activeFilters.environments.size > 0) {
+                    const exampleEnvironments = example.environments || [];
+                    if (!Array.from(activeFilters.environments).some(env => 
+                        exampleEnvironments.includes(env))) {
+                        return false;
+                    }
+                }
+                
+                // Filter by difficulty
+                if (activeFilters.difficulties.size > 0) {
+                    if (!activeFilters.difficulties.has(example.difficulty)) {
+                        return false;
+                    }
+                }
+                
+                // Filter by tools
+                if (activeFilters.tools.size > 0) {
+                    const exampleTools = (example.tools || []).map(tool => 
+                        typeof tool === 'object' ? tool.name : tool);
+                    if (!Array.from(activeFilters.tools).some(tool => 
+                        exampleTools.includes(tool))) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+        }
+        
+        // Render examples
+        function renderExamples() {
+            const container = document.getElementById('examples-container');
+            
+            if (!filteredExamples || filteredExamples.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <h3>No Examples Found</h3>
+                        <p>Try adjusting your search criteria or filters.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredExamples.map(example => `
+                <div class="example-card">
+                    <h3 class="example-title">
+                        <a href="${example.url}">${example.title}</a>
+                    </h3>
+                    <p class="example-description">${example.description}</p>
+                    <div class="example-meta">
+                        ${(example.categories || []).map(tag => 
+                            `<span class="example-tag">${tag}</span>`
+                        ).join('')}
+                    </div>
+                    <div class="example-meta">
+                        ${(example.environments || []).map(env => 
+                            `<span class="example-tag">${env}</span>`
+                        ).join('')}
+                    </div>
+                    ${example.difficulty ? 
+                        `<div class="example-difficulty ${example.difficulty}">
+                            Difficulty: ${example.difficulty}
+                        </div>` : ''}
+                    ${example.time_required ? 
+                        `<div>Time: ${example.time_required}</div>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadExamplesData);
+    </script>
+</body>
+</html>

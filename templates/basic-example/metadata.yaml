@@ -1,0 +1,19 @@
+# Example Metadata
+title: "Example Title"
+description: "Brief description of what this example demonstrates"
+categories:
+  - "category1"
+  - "category2"
+difficulty: "beginner" # Options: beginner, intermediate, advanced
+time_required: "30 minutes"
+environments:
+  - "AWS" # Options: AWS, GCP, Azure, Kubernetes, On-premises
+tools:
+  - name: "Q CLI"
+    version: ">=1.0.0"
+  - name: "Datadog Agent"
+    version: ">=7.0.0"
+contributors:
+  - name: "Your Name"
+    github: "yourgithubusername"
+last_tested: "YYYY-MM-DD"

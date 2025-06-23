@@ -1,0 +1,26 @@
+# Example Metadata
+title: "Advanced Example Title"
+description: "Comprehensive description of what this advanced example demonstrates"
+categories:
+  - "category1"
+  - "category2"
+  - "category3"
+difficulty: "advanced" # Options: beginner, intermediate, advanced
+time_required: "2 hours"
+environments:
+  - "AWS" 
+  - "Kubernetes"
+tools:
+  - name: "Q CLI"
+    version: ">=1.0.0"
+  - name: "Datadog Agent"
+    version: ">=7.0.0"
+  - name: "Additional Tool"
+    version: ">=2.0.0"
+contributors:
+  - name: "Your Name"
+    github: "yourgithubusername"
+last_tested: "YYYY-MM-DD"
+related_examples:
+  - "examples/category/related-example-1"
+  - "examples/category/related-example-2"

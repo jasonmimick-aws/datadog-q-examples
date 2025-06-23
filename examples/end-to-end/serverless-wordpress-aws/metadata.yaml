@@ -1,0 +1,31 @@
+# Example Metadata
+title: "Serverless WordPress on AWS with Datadog"
+description: "Deploy and monitor a serverless WordPress installation on AWS using ECS Fargate, Aurora Serverless, and Datadog monitoring with Q CLI integration for incident management"
+categories:
+  - "serverless"
+  - "wordpress"
+  - "aws"
+  - "containers"
+  - "database"
+difficulty: "intermediate"
+time_required: "2 hours"
+environments:
+  - "AWS"
+tools:
+  - name: "Q CLI"
+    version: ">=1.0.0"
+  - name: "Datadog Agent"
+    version: ">=7.36.0"
+  - name: "Terraform"
+    version: ">=1.0.0"
+  - name: "AWS CLI"
+    version: ">=2.0.0"
+  - name: "Docker"
+    version: ">=20.10.0"
+contributors:
+  - name: "Datadog Q Examples Team"
+    github: "datadog-q-examples"
+last_tested: "2025-06-20"
+related_examples:
+  - "examples/performance-issues/wordpress-slow-queries"
+  - "examples/resource-optimization/ecs-fargate-rightsizing"

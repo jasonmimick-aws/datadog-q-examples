@@ -1,0 +1,50 @@
+## Datadog Agent Configuration for WordPress on ECS
+
+# API key is set via environment variable DD_API_KEY
+
+# General settings
+api_key: ${DD_API_KEY}
+site: ${DD_SITE}
+hostname: ecs-wordpress
+
+# Enable logs collection
+logs_enabled: true
+logs_config:
+  container_collect_all: true
+  
+# Enable APM (tracing)
+apm_config:
+  enabled: true
+  
+# Enable process collection
+process_config:
+  process_collection:
+    enabled: true
+    
+# Enable container collection
+container_collect_all: true
+
+# ECS specific configuration
+ecs_collect_resource_tags_ec2: true
+
+# Integrations
+integrations:
+  # MySQL integration for WordPress database
+  mysql:
+    instances:
+      - host: ${WORDPRESS_DB_HOST}
+        port: 3306
+        username: ${WORDPRESS_DB_USER}
+        password: ${WORDPRESS_DB_PASSWORD}
+        dbname: ${WORDPRESS_DB_NAME}
+        tags:
+          - "service:wordpress"
+          - "env:production"
+  
+  # Apache integration for WordPress web server
+  apache:
+    instances:
+      - apache_status_url: http://localhost/server-status?auto
+        tags:
+          - "service:wordpress"
+          - "env:production"
