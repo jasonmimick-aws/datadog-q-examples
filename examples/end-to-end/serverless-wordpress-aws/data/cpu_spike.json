@@ -1,0 +1,137 @@
+{
+  "metadata": {
+    "service": "wordpress",
+    "environment": "production",
+    "timestamp": "2025-06-23T10:15:00Z",
+    "scenario": "CPU Spike",
+    "description": "Test data simulating a CPU spike in the WordPress service"
+  },
+  "metrics": {
+    "series": [
+      {
+        "metric": "ecs.fargate.cpu.percent",
+        "display_name": "CPU Utilization",
+        "unit": "percent",
+        "pointlist": [
+          [1719133200000, 45.2],
+          [1719133260000, 48.7],
+          [1719133320000, 52.1],
+          [1719133380000, 67.8],
+          [1719133440000, 78.3],
+          [1719133500000, 85.6],
+          [1719133560000, 92.4],
+          [1719133620000, 97.8],
+          [1719133680000, 99.1],
+          [1719133740000, 98.7],
+          [1719133800000, 95.2],
+          [1719133860000, 90.8],
+          [1719133920000, 87.3],
+          [1719133980000, 82.1],
+          [1719134040000, 75.6],
+          [1719134100000, 68.9],
+          [1719134160000, 62.3],
+          [1719134220000, 55.7],
+          [1719134280000, 49.2],
+          [1719134340000, 45.8]
+        ],
+        "tags": ["service:wordpress", "env:production"]
+      }
+    ]
+  },
+  "logs": {
+    "data": [
+      {
+        "timestamp": "2025-06-23T10:17:30Z",
+        "content": "WordPress process using high CPU (85.6%)",
+        "service": "wordpress",
+        "source": "ecs-agent",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T10:18:45Z",
+        "content": "High load detected on WordPress container",
+        "service": "wordpress",
+        "source": "datadog-agent",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T10:19:15Z",
+        "content": "PHP-FPM worker pool reaching max children",
+        "service": "wordpress",
+        "source": "php-fpm",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T10:20:00Z",
+        "content": "WordPress admin dashboard showing slow response times",
+        "service": "wordpress",
+        "source": "nginx",
+        "tags": ["service:wordpress", "env:production"]
+      }
+    ]
+  },
+  "traces": {
+    "data": [
+      {
+        "trace_id": "1234567890abcdef",
+        "span_id": "abcdef1234567890",
+        "name": "wp-admin/admin-ajax.php",
+        "resource": "/wp-admin/admin-ajax.php",
+        "service": "wordpress",
+        "start": 1719133560000000000,
+        "duration": 2500000000,
+        "error": 0,
+        "meta": {
+          "http.method": "POST",
+          "http.url": "/wp-admin/admin-ajax.php",
+          "http.status_code": "200"
+        },
+        "metrics": {
+          "process.cpu.percent": 92.4
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "alert": "High CPU usage detected (92.4% > 80%)",
+    "causes": [
+      "Traffic spike",
+      "Inefficient WordPress plugins",
+      "Resource-intensive background processes"
+    ],
+    "actions": [
+      "Check for recent traffic patterns",
+      "Review active plugins",
+      "Consider scaling up the service"
+    ]
+  },
+  "expected_analysis": {
+    "root_cause": "High CPU utilization",
+    "details": "The metrics show CPU usage exceeding 80%, which can lead to performance degradation and potential timeouts.",
+    "specific_causes": [
+      "Traffic spike exceeding current capacity",
+      "Inefficient WordPress plugins consuming excessive CPU",
+      "Poorly optimized database queries",
+      "Background processes consuming resources"
+    ],
+    "recommended_actions": [
+      "Scale up the ECS service to handle the increased load",
+      "Review and optimize WordPress plugins",
+      "Implement caching to reduce CPU load",
+      "Optimize database queries"
+    ]
+  },
+  "expected_remediation": {
+    "actions": [
+      "Scale ECS service to increase capacity",
+      "Update task definition with more CPU resources",
+      "Implement WordPress optimizations",
+      "Add caching layer to reduce CPU load"
+    ],
+    "verification": [
+      "Monitor Datadog dashboards for improvement in CPU metrics",
+      "Verify WordPress performance under load",
+      "Check for reduction in response times"
+    ]
+  }
+}

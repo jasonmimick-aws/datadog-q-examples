@@ -1,0 +1,148 @@
+{
+  "metadata": {
+    "service": "wordpress",
+    "environment": "production",
+    "timestamp": "2025-06-23T11:30:00Z",
+    "scenario": "Memory Leak",
+    "description": "Test data simulating a memory leak in the WordPress service"
+  },
+  "metrics": {
+    "series": [
+      {
+        "metric": "ecs.fargate.mem.usage",
+        "display_name": "Memory Usage",
+        "unit": "bytes",
+        "pointlist": [
+          [1719137400000, 1073741824],
+          [1719137460000, 1181116006],
+          [1719137520000, 1288490188],
+          [1719137580000, 1395864370],
+          [1719137640000, 1503238552],
+          [1719137700000, 1610612734],
+          [1719137760000, 1717986916],
+          [1719137820000, 1825361098],
+          [1719137880000, 1932735280],
+          [1719137940000, 2040109462],
+          [1719138000000, 2147483644],
+          [1719138060000, 2254857826],
+          [1719138120000, 2362232008],
+          [1719138180000, 2469606190],
+          [1719138240000, 2576980372],
+          [1719138300000, 2684354554],
+          [1719138360000, 2791728736],
+          [1719138420000, 2899102918],
+          [1719138480000, 3006477100],
+          [1719138540000, 3113851282]
+        ],
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "metric": "ecs.fargate.mem.limit",
+        "display_name": "Memory Limit",
+        "unit": "bytes",
+        "pointlist": [
+          [1719137400000, 4294967296],
+          [1719138540000, 4294967296]
+        ],
+        "tags": ["service:wordpress", "env:production"]
+      }
+    ]
+  },
+  "logs": {
+    "data": [
+      {
+        "timestamp": "2025-06-23T11:45:00Z",
+        "content": "PHP Warning: Memory allocation failure",
+        "service": "wordpress",
+        "source": "php-fpm",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T11:48:30Z",
+        "content": "WordPress plugin 'example-gallery' showing memory usage warnings",
+        "service": "wordpress",
+        "source": "wordpress",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T11:52:15Z",
+        "content": "PHP Notice: Trying to allocate 16777216 bytes",
+        "service": "wordpress",
+        "source": "php-fpm",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T11:55:45Z",
+        "content": "Container approaching memory limit (72% used)",
+        "service": "wordpress",
+        "source": "datadog-agent",
+        "tags": ["service:wordpress", "env:production"]
+      }
+    ]
+  },
+  "traces": {
+    "data": [
+      {
+        "trace_id": "0987654321fedcba",
+        "span_id": "fedcba0987654321",
+        "name": "wp-content/plugins/example-gallery/process.php",
+        "resource": "/wp-content/plugins/example-gallery/process.php",
+        "service": "wordpress",
+        "start": 1719138000000000000,
+        "duration": 3200000000,
+        "error": 1,
+        "meta": {
+          "http.method": "POST",
+          "http.url": "/wp-content/plugins/example-gallery/process.php",
+          "http.status_code": "500",
+          "error.msg": "Allowed memory size of 256M bytes exhausted"
+        },
+        "metrics": {
+          "process.mem.rss": 2147483644
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "alert": "High memory usage detected (72% > 70%)",
+    "causes": [
+      "Memory leaks in WordPress plugins",
+      "Insufficient memory allocation",
+      "Large media processing operations"
+    ],
+    "actions": [
+      "Review memory-intensive plugins",
+      "Consider increasing memory allocation",
+      "Optimize media handling"
+    ]
+  },
+  "expected_analysis": {
+    "root_cause": "Memory leak in WordPress plugin",
+    "details": "The metrics show steadily increasing memory usage over time, which is characteristic of a memory leak. Logs indicate the 'example-gallery' plugin is likely responsible.",
+    "specific_causes": [
+      "Memory leak in 'example-gallery' plugin",
+      "Inefficient memory management in PHP code",
+      "Large media files being processed without proper memory constraints",
+      "Accumulated cached data not being released"
+    ],
+    "recommended_actions": [
+      "Disable or update the 'example-gallery' plugin",
+      "Increase memory allocation as a temporary measure",
+      "Implement proper memory management in custom code",
+      "Add memory monitoring and automatic restart mechanisms"
+    ]
+  },
+  "expected_remediation": {
+    "actions": [
+      "Update task definition with more memory",
+      "Disable problematic 'example-gallery' plugin",
+      "Implement memory limits in PHP configuration",
+      "Add monitoring alerts for memory usage trends"
+    ],
+    "verification": [
+      "Monitor Datadog dashboards for stabilized memory usage",
+      "Verify WordPress functionality without the problematic plugin",
+      "Check for absence of memory-related errors in logs"
+    ]
+  }
+}

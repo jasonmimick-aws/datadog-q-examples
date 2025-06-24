@@ -87,11 +87,24 @@ cat > $metrics_file << EOF
 }
 EOF
 
-# Use Q CLI to analyze the metrics (this is a placeholder for the actual Q CLI command)
-# In a real implementation, this would use the Q CLI to analyze the metrics
+# Use Q CLI to analyze the metrics
 echo "Q CLI analysis:"
 echo "Analyzing metrics data in $metrics_file"
-echo "This would use Q CLI to analyze the metrics and provide recommendations"
+
+# Q CLI commands for detection
+echo "Running Q CLI detection commands..."
+
+# Q CLI command for anomaly detection
+echo "q detect anomalies --metrics-file $metrics_file --service $SERVICE_NAME --environment $ENVIRONMENT --output anomalies.json"
+
+# Q CLI command for threshold violation detection
+echo "q detect threshold-violations --metrics-file $metrics_file --thresholds cpu=$THRESHOLD_CPU,memory=$THRESHOLD_MEMORY,errors=$THRESHOLD_ERRORS,latency=$THRESHOLD_LATENCY --output violations.json"
+
+# Q CLI command for pattern detection
+echo "q detect patterns --service $SERVICE_NAME --environment $ENVIRONMENT --time-range '5m' --output patterns.json"
+
+# In a real implementation, we would execute these Q CLI commands
+# For demonstration purposes, we'll simulate the output
 
 # For demonstration purposes, we'll implement a simple analysis here
 if (( $(echo "$cpu_value > $THRESHOLD_CPU" | bc -l) )); then

@@ -1,0 +1,192 @@
+{
+  "metadata": {
+    "service": "wordpress",
+    "environment": "production",
+    "timestamp": "2025-06-23T16:00:00Z",
+    "scenario": "PHP Application Errors",
+    "description": "Test data simulating PHP application errors in the WordPress service"
+  },
+  "metrics": {
+    "series": [
+      {
+        "metric": "trace.http.request.errors",
+        "display_name": "HTTP Errors",
+        "unit": "count",
+        "pointlist": [
+          [1719154800000, 0],
+          [1719154860000, 2],
+          [1719154920000, 5],
+          [1719154980000, 8],
+          [1719155040000, 12],
+          [1719155100000, 15],
+          [1719155160000, 18],
+          [1719155220000, 20],
+          [1719155280000, 17],
+          [1719155340000, 14],
+          [1719155400000, 10],
+          [1719155460000, 7],
+          [1719155520000, 5],
+          [1719155580000, 3],
+          [1719155640000, 1],
+          [1719155700000, 0],
+          [1719155760000, 0],
+          [1719155820000, 0],
+          [1719155880000, 0],
+          [1719155940000, 0]
+        ],
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "metric": "ecs.fargate.cpu.percent",
+        "display_name": "CPU Utilization",
+        "unit": "percent",
+        "pointlist": [
+          [1719154800000, 45.2],
+          [1719154860000, 48.7],
+          [1719154920000, 52.1],
+          [1719154980000, 55.8],
+          [1719155040000, 58.3],
+          [1719155100000, 60.6],
+          [1719155160000, 62.4],
+          [1719155220000, 65.8],
+          [1719155280000, 63.1],
+          [1719155340000, 60.7],
+          [1719155400000, 58.2],
+          [1719155460000, 55.8],
+          [1719155520000, 53.3],
+          [1719155580000, 50.1],
+          [1719155640000, 48.6],
+          [1719155700000, 46.9],
+          [1719155760000, 45.3],
+          [1719155820000, 44.7],
+          [1719155880000, 44.2],
+          [1719155940000, 43.8]
+        ],
+        "tags": ["service:wordpress", "env:production"]
+      }
+    ]
+  },
+  "logs": {
+    "data": [
+      {
+        "timestamp": "2025-06-23T16:05:30Z",
+        "content": "PHP Fatal error: Uncaught Error: Call to undefined function example_function() in /var/www/html/wp-content/themes/custom-theme/functions.php:156",
+        "service": "wordpress",
+        "source": "php-fpm",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T16:06:45Z",
+        "content": "PHP Warning: Invalid argument supplied for foreach() in /var/www/html/wp-content/plugins/custom-plugin/includes/class-data-processor.php on line 247",
+        "service": "wordpress",
+        "source": "php-fpm",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T16:08:15Z",
+        "content": "PHP Notice: Undefined index: user_id in /var/www/html/wp-content/plugins/custom-plugin/includes/class-user-handler.php on line 89",
+        "service": "wordpress",
+        "source": "php-fpm",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T16:10:00Z",
+        "content": "WordPress critical error: Uncaught exception 'Exception' with message 'Invalid data format' in /var/www/html/wp-content/plugins/custom-plugin/includes/class-api-client.php:203",
+        "service": "wordpress",
+        "source": "wordpress",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T16:12:30Z",
+        "content": "PHP Fatal error: Allowed memory size of 134217728 bytes exhausted (tried to allocate 20971520 bytes) in /var/www/html/wp-includes/class-wp-image-editor.php on line 402",
+        "service": "wordpress",
+        "source": "php-fpm",
+        "tags": ["service:wordpress", "env:production"]
+      }
+    ]
+  },
+  "traces": {
+    "data": [
+      {
+        "trace_id": "5678901234abcdef",
+        "span_id": "abcdef5678901234",
+        "name": "wp-content/themes/custom-theme/functions.php",
+        "resource": "/wp-content/themes/custom-theme/functions.php",
+        "service": "wordpress",
+        "start": 1719155100000000000,
+        "duration": 500000000,
+        "error": 1,
+        "meta": {
+          "http.method": "GET",
+          "http.url": "/",
+          "http.status_code": "500",
+          "error.msg": "Uncaught Error: Call to undefined function example_function()"
+        },
+        "metrics": {
+          "process.cpu.percent": 60.6
+        }
+      },
+      {
+        "trace_id": "9012345678abcdef",
+        "span_id": "abcdef9012345678",
+        "name": "wp-content/plugins/custom-plugin/includes/class-api-client.php",
+        "resource": "/wp-content/plugins/custom-plugin/includes/class-api-client.php",
+        "service": "wordpress",
+        "start": 1719155160000000000,
+        "duration": 750000000,
+        "error": 1,
+        "meta": {
+          "http.method": "POST",
+          "http.url": "/wp-admin/admin-ajax.php",
+          "http.status_code": "500",
+          "error.msg": "Uncaught exception 'Exception' with message 'Invalid data format'"
+        },
+        "metrics": {
+          "process.cpu.percent": 62.4
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "alert": "High error rate detected (20 > 5)",
+    "causes": [
+      "PHP errors in themes or plugins",
+      "WordPress core issues",
+      "Plugin compatibility problems"
+    ],
+    "actions": [
+      "Review WordPress error logs",
+      "Check recently updated plugins or themes",
+      "Verify PHP version compatibility"
+    ]
+  },
+  "expected_analysis": {
+    "root_cause": "PHP application errors",
+    "details": "The logs show PHP errors, which indicate issues with the WordPress application code.",
+    "specific_causes": [
+      "Custom theme function errors",
+      "Plugin compatibility issues",
+      "Memory allocation problems in image processing",
+      "Undefined variables and invalid arguments"
+    ],
+    "recommended_actions": [
+      "Review PHP error logs for specific error messages",
+      "Disable recently added or updated plugins",
+      "Switch to a default theme to rule out theme issues",
+      "Verify PHP configuration settings"
+    ]
+  },
+  "expected_remediation": {
+    "actions": [
+      "Update PHP configuration",
+      "Fix PHP errors in WordPress code",
+      "Update WordPress plugins to compatible versions",
+      "Increase PHP memory limits"
+    ],
+    "verification": [
+      "Monitor Datadog dashboards for reduction in error rates",
+      "Verify WordPress functionality",
+      "Check for absence of PHP errors in logs"
+    ]
+  }
+}

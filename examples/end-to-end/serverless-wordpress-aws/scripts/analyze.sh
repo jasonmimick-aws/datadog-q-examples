@@ -115,7 +115,24 @@ fetch_traces
 
 # Analyze the data using Q CLI
 echo "Analyzing data with Q CLI..."
-echo "This would use Q CLI to analyze the collected data and determine the root cause"
+
+# Use Q CLI to analyze the collected data
+echo "Running Q CLI analysis..."
+
+# Q CLI command for log analysis
+echo "q logs analyze --service $SERVICE_NAME --environment $ENVIRONMENT --time-range $TIME_RANGE --output $ANALYSIS_DIR/q_logs_analysis.json"
+
+# Q CLI command for metric analysis
+echo "q metrics analyze --service $SERVICE_NAME --environment $ENVIRONMENT --time-range $TIME_RANGE --output $ANALYSIS_DIR/q_metrics_analysis.json"
+
+# Q CLI command for trace analysis
+echo "q traces analyze --service $SERVICE_NAME --environment $ENVIRONMENT --time-range $TIME_RANGE --output $ANALYSIS_DIR/q_traces_analysis.json"
+
+# Q CLI command for root cause determination
+echo "q analyze root-cause --logs $ANALYSIS_DIR/logs.json --metrics $ANALYSIS_DIR/cpu_metrics.json,$ANALYSIS_DIR/memory_metrics.json,$ANALYSIS_DIR/error_metrics.json,$ANALYSIS_DIR/db_metrics.json --traces $ANALYSIS_DIR/traces.json --output $ANALYSIS_DIR/q_root_cause.json"
+
+# In a real implementation, we would execute these Q CLI commands
+# For demonstration purposes, we'll simulate the output
 
 # For demonstration purposes, we'll implement a simple analysis here
 echo "Performing analysis on collected data..."

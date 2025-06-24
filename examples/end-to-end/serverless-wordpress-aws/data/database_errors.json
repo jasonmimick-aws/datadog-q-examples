@@ -1,0 +1,173 @@
+{
+  "metadata": {
+    "service": "wordpress",
+    "environment": "production",
+    "timestamp": "2025-06-23T14:00:00Z",
+    "scenario": "Database Connectivity Issues",
+    "description": "Test data simulating database connectivity issues in the WordPress service"
+  },
+  "metrics": {
+    "series": [
+      {
+        "metric": "mysql.net.connections",
+        "display_name": "Database Connections",
+        "unit": "count",
+        "pointlist": [
+          [1719146400000, 15],
+          [1719146460000, 12],
+          [1719146520000, 8],
+          [1719146580000, 5],
+          [1719146640000, 2],
+          [1719146700000, 0],
+          [1719146760000, 0],
+          [1719146820000, 0],
+          [1719146880000, 1],
+          [1719146940000, 0],
+          [1719147000000, 0],
+          [1719147060000, 2],
+          [1719147120000, 5],
+          [1719147180000, 8],
+          [1719147240000, 10],
+          [1719147300000, 12],
+          [1719147360000, 15],
+          [1719147420000, 16],
+          [1719147480000, 15],
+          [1719147540000, 15]
+        ],
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "metric": "trace.http.request.errors",
+        "display_name": "HTTP Errors",
+        "unit": "count",
+        "pointlist": [
+          [1719146400000, 0],
+          [1719146460000, 2],
+          [1719146520000, 5],
+          [1719146580000, 12],
+          [1719146640000, 18],
+          [1719146700000, 25],
+          [1719146760000, 28],
+          [1719146820000, 30],
+          [1719146880000, 27],
+          [1719146940000, 24],
+          [1719147000000, 20],
+          [1719147060000, 15],
+          [1719147120000, 10],
+          [1719147180000, 5],
+          [1719147240000, 2],
+          [1719147300000, 1],
+          [1719147360000, 0],
+          [1719147420000, 0],
+          [1719147480000, 0],
+          [1719147540000, 0]
+        ],
+        "tags": ["service:wordpress", "env:production"]
+      }
+    ]
+  },
+  "logs": {
+    "data": [
+      {
+        "timestamp": "2025-06-23T14:05:30Z",
+        "content": "WordPress database error: [MySQL server has gone away] for query SELECT * FROM wp_options",
+        "service": "wordpress",
+        "source": "wordpress",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T14:06:45Z",
+        "content": "Error establishing a database connection",
+        "service": "wordpress",
+        "source": "wordpress",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T14:08:15Z",
+        "content": "PHP Warning: mysqli_connect(): (HY000/2002): Connection refused",
+        "service": "wordpress",
+        "source": "php-fpm",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T14:10:00Z",
+        "content": "Database connection timeout after 10 seconds",
+        "service": "wordpress",
+        "source": "wordpress",
+        "tags": ["service:wordpress", "env:production"]
+      },
+      {
+        "timestamp": "2025-06-23T14:15:30Z",
+        "content": "Database connection re-established",
+        "service": "wordpress",
+        "source": "wordpress",
+        "tags": ["service:wordpress", "env:production"]
+      }
+    ]
+  },
+  "traces": {
+    "data": [
+      {
+        "trace_id": "abcdef1234567890",
+        "span_id": "1234567890abcdef",
+        "name": "wp-includes/load.php",
+        "resource": "wp-includes/load.php",
+        "service": "wordpress",
+        "start": 1719146700000000000,
+        "duration": 5000000000,
+        "error": 1,
+        "meta": {
+          "http.method": "GET",
+          "http.url": "/",
+          "http.status_code": "500",
+          "error.msg": "Error establishing a database connection"
+        },
+        "metrics": {
+          "mysql.connections": 0
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "alert": "Database connection issues detected",
+    "causes": [
+      "Database server down",
+      "Security group misconfiguration",
+      "Network connectivity issues"
+    ],
+    "actions": [
+      "Check database server status",
+      "Verify security group rules",
+      "Check network connectivity"
+    ]
+  },
+  "expected_analysis": {
+    "root_cause": "Database connectivity issues",
+    "details": "The logs show database-related errors, and there are HTTP errors in the metrics. This suggests that the WordPress application is unable to connect to the database properly.",
+    "specific_causes": [
+      "Security group misconfiguration blocking database access",
+      "Database credentials issues",
+      "Database server performance problems",
+      "Network connectivity issues between the ECS tasks and the database"
+    ],
+    "recommended_actions": [
+      "Verify security group rules allow traffic from ECS to the database",
+      "Check database credentials in the ECS task definition",
+      "Monitor database performance metrics for signs of overload",
+      "Check network connectivity between ECS and the database"
+    ]
+  },
+  "expected_remediation": {
+    "actions": [
+      "Update security group rules to allow database traffic",
+      "Verify and update database credentials",
+      "Implement connection pooling",
+      "Add database connection retry logic"
+    ],
+    "verification": [
+      "Monitor Datadog dashboards for stable database connections",
+      "Verify WordPress can connect to the database",
+      "Check for absence of database-related errors in logs"
+    ]
+  }
+}
